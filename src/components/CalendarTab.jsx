@@ -170,7 +170,7 @@ export default function CalendarTab() {
       )}
       {view === 'week' && <WeekView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />}
       {view === 'year' && <YearView cursor={cursor} openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} trades={trades} goToMonth={(m) => { setCursor(new Date(cursor.getFullYear(), m, 1)); setView('month') }} />}
-      {view === 'alltime' && <AllTimeView getMonthSummary={getMonthSummary} getAllYears={getAllYears} goToMonth={(year, m) => { setCursor(new Date(year, m, 1)); setView('month') }} />}
+      {view === 'alltime' && <AllTimeView getMonthSummary={getMonthSummary} getAllYears={getAllYears} goToMonth={(year, m) => { setCursor(new Date(year, m, 1)); setView('month') }} goToYear={(year) => { setCursor(new Date(year, 0, 1)); setView('year') }} />}
 
       {/* Chart */}
       <div style={{
@@ -518,7 +518,7 @@ function YearView({ cursor, openModal, getDayNet, getMonthSummary, trades, goToM
 }
 
 // ── All Time View ────────────────────────────────────────────────
-function AllTimeView({ getMonthSummary, getAllYears, goToMonth }) {
+function AllTimeView({ getMonthSummary, getAllYears, goToMonth, goToYear }) {
   const years = getAllYears()
 
   if (years.length === 0) {
@@ -552,7 +552,7 @@ function AllTimeView({ getMonthSummary, getAllYears, goToMonth }) {
         return (
           <div key={year} className="alltime-year-section">
             <div className="alltime-year-header">
-              <span className="alltime-year-label">{year}</span>
+              <span className="alltime-year-label year-month-name" onClick={() => goToYear(year)} style={{ cursor: 'pointer' }}>{year}</span>
               <span className={`alltime-year-total ${yearTotal > 0 ? 'positive' : yearTotal < 0 ? 'negative' : 'neutral'}`}
                 style={{ color: yearTotal > 0 ? 'var(--green)' : yearTotal < 0 ? 'var(--red)' : 'var(--text-muted)' }}>
                 {yearTotal !== 0 ? formatCurrency(yearTotal) : '—'}
