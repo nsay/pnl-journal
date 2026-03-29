@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTrades, formatDateKey, formatCurrency, formatCurrencyPlain } from '../context/TradesContext'
 import TradeModal from './TradeModal'
 import { WeekChart, MonthChart, YearChart, AllTimeChart } from './PnLChart'
@@ -21,7 +21,7 @@ export default function CalendarTab() {
   const [view, setView] = useState('month')
   const [cursor, setCursor] = useState(new Date(today))
   const [modalDate, setModalDate] = useState(null)
-  const { getDayNet, getMonthSummary, getWeekSummary, getAllYears, trades } = useTrades()
+  const { getDayNet, getMonthSummary, getWeekSummary, getAllYears, trades, saveNote, getNote } = useTrades()
 
   function openModal(date) { setModalDate(date) }
   function closeModal() { setModalDate(null) }
@@ -162,7 +162,12 @@ export default function CalendarTab() {
       </div>
 
       {/* Calendar body */}
-      {view === 'month' && <MonthView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />}
+      {view === 'month' && (
+        <>
+          <MonthNotes cursor={cursor} saveNote={saveNote} getNote={getNote} />
+          <MonthView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />
+        </>
+      )}
       {view === 'week' && <WeekView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />}
       {view === 'year' && <YearView cursor={cursor} openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} trades={trades} />}
       {view === 'alltime' && <AllTimeView openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} getAllYears={getAllYears} />}
@@ -188,6 +193,94 @@ export default function CalendarTab() {
       </div>
 
       {modalDate && <TradeModal date={modalDate} onClose={closeModal} />}
+    </div>
+  )
+}
+
+// ── Keyword badge ────────────────────────────────────────────────
+const NOTE_KEYWORDS = {
+  BULLISH:  { bg: 'var(--green-dim)',                border: 'var(--green-border)',               color: 'var(--green)' },
+  BEARISH:  { bg: 'var(--red-dim)',                  border: 'var(--red-border)',                 color: 'var(--red)' },
+  CHOPPY:   { bg: 'rgba(245,158,11,0.1)',            border: 'rgba(245,158,11,0.3)',              color: 'var(--yellow)' },
+  FLAT:     { bg: 'rgba(100,116,139,0.12)',          border: 'rgba(100,116,139,0.3)',             color: 'var(--text-secondary)' },
+}
+
+function detectKeyword(text) {
+  const upper = text.trimStart().toUpperCase()
+  return Object.keys(NOTE_KEYWORDS).find(kw => upper.startsWith(kw)) || null
+}
+
+function KeywordBadge({ keyword }) {
+  const style = NOTE_KEYWORDS[keyword]
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '2px 8px',
+      borderRadius: 4,
+      fontSize: 10.5,
+      fontWeight: 800,
+      letterSpacing: '0.6px',
+      background: style.bg,
+      border: `1px solid ${style.border}`,
+      color: style.color,
+      flexShrink: 0,
+    }}>
+      {keyword}
+    </span>
+  )
+}
+
+// ── Month Notes ──────────────────────────────────────────────────
+function MonthNotes({ cursor, saveNote, getNote }) {
+  const monthKey = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`
+  const [text, setText] = useState(() => getNote(monthKey))
+  const [expanded, setExpanded] = useState(() => !!getNote(monthKey))
+  const saveTimer = useRef(null)
+
+  useEffect(() => {
+    setText(getNote(monthKey))
+    setExpanded(!!getNote(monthKey))
+  }, [monthKey])
+
+  function handleChange(e) {
+    const val = e.target.value
+    setText(val)
+    clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => saveNote(monthKey, val), 600)
+  }
+
+  function handleBlur() {
+    clearTimeout(saveTimer.current)
+    saveNote(monthKey, text)
+  }
+
+  const keyword = text ? detectKeyword(text) : null
+  // Strip "KEYWORD - " prefix for the body preview/display
+  const bodyText = keyword ? text.replace(new RegExp(`^${keyword}\\s*-?\\s*`, 'i'), '') : text
+
+  return (
+    <div className="month-notes">
+      <button className="month-notes-toggle" onClick={() => setExpanded(e => !e)}>
+        <span className="month-notes-icon">📝</span>
+        <span className="month-notes-label">Monthly Notes</span>
+        {keyword && <KeywordBadge keyword={keyword} />}
+        {text && !expanded && (
+          <span className="month-notes-preview">{bodyText.slice(0, 60)}{bodyText.length > 60 ? '…' : ''}</span>
+        )}
+        <span className="month-notes-chevron">{expanded ? '▲' : '▼'}</span>
+      </button>
+      {expanded && (
+        <textarea
+          className="month-notes-textarea"
+          placeholder="Add notes for this month — start with BULLISH, BEARISH, CHOPPY, or FLAT to tag the market condition."
+          value={text}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          rows={4}
+          autoFocus={!text}
+        />
+      )}
     </div>
   )
 }

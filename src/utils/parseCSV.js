@@ -55,6 +55,72 @@ export function parseCSVText(text) {
   return { data, totalTrades, totalDays, errors }
 }
 
+/**
+ * Fetches and parses /data/notes.csv
+ *
+ * Expected columns: month (YYYY-MM), notes
+ *
+ * Returns:
+ *   { data: { [monthKey]: string }, totalMonths, errors }
+ */
+export async function fetchAndParseNotesCSV(path = `${import.meta.env.BASE_URL}data/notes.csv`) {
+  const res = await fetch(path)
+  if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`)
+  const text = await res.text()
+  return parseNotesCSVText(text)
+}
+
+export function parseNotesCSVText(text) {
+  const lines = text.trim().split(/\r?\n/).filter(Boolean)
+  if (lines.length < 2) throw new Error('Notes CSV has no data rows')
+
+  const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim())
+  if (!headers.includes('month') || !headers.includes('notes')) {
+    throw new Error('Notes CSV must have "month" and "notes" columns')
+  }
+
+  const monthIdx = headers.indexOf('month')
+  const notesIdx = headers.indexOf('notes')
+  const data = {}
+  const errors = []
+
+  lines.slice(1).forEach((line, i) => {
+    const values = parseCSVLine(line)
+    const month = (values[monthIdx] || '').trim()
+    const notes = (values[notesIdx] || '').trim()
+
+    if (!/^\d{4}-\d{2}$/.test(month)) {
+      errors.push(`Row ${i + 2}: invalid month "${month}" — expected YYYY-MM`)
+      return
+    }
+    if (notes) data[month] = notes
+  })
+
+  return { data, totalMonths: Object.keys(data).length, errors }
+}
+
+// Handles quoted fields (e.g. "text with, commas")
+function parseCSVLine(line) {
+  const fields = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++ }
+      else inQuotes = !inQuotes
+    } else if (ch === ',' && !inQuotes) {
+      fields.push(current)
+      current = ''
+    } else {
+      current += ch
+    }
+  }
+  fields.push(current)
+  return fields
+}
+
 function normaliseHeader(h) {
   // Map common variants to camelCase field names
   const map = {

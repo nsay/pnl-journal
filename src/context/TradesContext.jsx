@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 const TradesContext = createContext(null)
 
 const STORAGE_KEY = 'pnl_journal_trades'
+const NOTES_KEY = 'pnl_journal_notes'
 
 export function TradesProvider({ children }) {
   const [trades, setTrades] = useState(() => {
@@ -15,6 +16,32 @@ export function TradesProvider({ children }) {
       return {}
     }
   })
+
+  const [notes, setNotes] = useState(() => {
+    try {
+      const stored = localStorage.getItem(NOTES_KEY)
+      return stored ? JSON.parse(stored) : {}
+    } catch {
+      return {}
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes))
+  }, [notes])
+
+  function saveNote(monthKey, text) {
+    setNotes(prev => {
+      const next = { ...prev }
+      if (!text.trim()) delete next[monthKey]
+      else next[monthKey] = text
+      return next
+    })
+  }
+
+  function getNote(monthKey) {
+    return notes[monthKey] || ''
+  }
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trades))
@@ -95,6 +122,7 @@ export function TradesProvider({ children }) {
 
   function clearAllTrades() {
     setTrades({})
+    setNotes({})
   }
 
   return (
@@ -107,6 +135,8 @@ export function TradesProvider({ children }) {
       getMonthSummary,
       getWeekSummary,
       getAllYears,
+      saveNote,
+      getNote,
     }}>
       {children}
     </TradesContext.Provider>
