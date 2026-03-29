@@ -84,6 +84,137 @@
   letter-spacing: 0.3px;
 }
 
+/* ── Settings Dropdown ── */
+.settings-wrap {
+  position: relative;
+}
+
+.settings-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+
+.settings-btn:hover,
+.settings-btn.active {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  overflow: hidden;
+  animation: slideUp 0.15s ease;
+}
+
+.settings-dropdown-header {
+  padding: 10px 14px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+
+.settings-item:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+}
+
+.settings-item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.settings-item.danger .settings-item-label {
+  color: var(--red);
+}
+
+.settings-item.danger:hover:not(:disabled) {
+  background: var(--red-dim);
+}
+
+.settings-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.settings-item-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1px;
+}
+
+.settings-item-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+.settings-confirm {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-confirm-text {
+  font-size: 12.5px;
+  color: var(--red);
+  font-weight: 500;
+}
+
+.settings-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* ── Theme Toggle ── */
 .theme-toggle {
   width: 36px;
@@ -211,22 +342,6 @@
   color: var(--text-primary);
   min-width: 150px;
   text-align: center;
-}
-
-.import-csv-btn {
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 12.5px;
-  font-weight: 600;
-  background: var(--accent-blue-dim);
-  border: 1px solid var(--accent-blue);
-  color: var(--accent-blue);
-  transition: all 0.15s;
-}
-
-.import-csv-btn:hover {
-  background: var(--accent-blue);
-  color: #fff;
 }
 
 .today-btn {

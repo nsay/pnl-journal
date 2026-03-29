@@ -93,10 +93,15 @@ export function TradesProvider({ children }) {
     return Array.from(years).sort((a, b) => b - a)
   }
 
+  function clearAllTrades() {
+    setTrades({})
+  }
+
   return (
     <TradesContext.Provider value={{
       trades,
       saveDayTrades,
+      clearAllTrades,
       getDayTrades,
       getDayNet,
       getMonthSummary,
