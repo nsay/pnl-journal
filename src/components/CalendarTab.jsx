@@ -170,7 +170,7 @@ export default function CalendarTab() {
       )}
       {view === 'week' && <WeekView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />}
       {view === 'year' && <YearView cursor={cursor} openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} trades={trades} goToMonth={(m) => { setCursor(new Date(cursor.getFullYear(), m, 1)); setView('month') }} />}
-      {view === 'alltime' && <AllTimeView openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} getAllYears={getAllYears} />}
+      {view === 'alltime' && <AllTimeView getMonthSummary={getMonthSummary} getAllYears={getAllYears} goToMonth={(year, m) => { setCursor(new Date(year, m, 1)); setView('month') }} />}
 
       {/* Chart */}
       <div style={{
@@ -518,7 +518,7 @@ function YearView({ cursor, openModal, getDayNet, getMonthSummary, trades, goToM
 }
 
 // ── All Time View ────────────────────────────────────────────────
-function AllTimeView({ openModal, getDayNet, getMonthSummary, getAllYears }) {
+function AllTimeView({ getMonthSummary, getAllYears, goToMonth }) {
   const years = getAllYears()
 
   if (years.length === 0) {
@@ -566,10 +566,7 @@ function AllTimeView({ openModal, getDayNet, getMonthSummary, getAllYears }) {
                   <div
                     key={m}
                     className="alltime-month-cell"
-                    onClick={() => {
-                      // Navigate user to month view for that month (open first day)
-                      openModal(new Date(year, m, 1))
-                    }}
+                    onClick={() => goToMonth(year, m)}
                     title={`${MONTHS[m]} ${year}`}
                   >
                     <div className="alltime-month-name">{MONTHS_SHORT[m]}</div>
