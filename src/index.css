@@ -1,0 +1,102 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #080c14;
+  --bg-secondary: #0c1220;
+  --bg-card: #111827;
+  --bg-card-hover: #162033;
+  --bg-input: #0c1220;
+  --bg-modal: #111827;
+  --border: #1e2d45;
+  --border-light: #243552;
+  --text-primary: #e2e8f4;
+  --text-secondary: #7a8bab;
+  --text-muted: #3d4f6e;
+  --accent-blue: #3b7af5;
+  --accent-blue-dim: rgba(59, 122, 245, 0.12);
+  --accent-blue-glow: rgba(59, 122, 245, 0.25);
+  --green: #22c55e;
+  --green-dim: rgba(34, 197, 94, 0.1);
+  --green-border: rgba(34, 197, 94, 0.25);
+  --green-bright: #4ade80;
+  --red: #ef4444;
+  --red-dim: rgba(239, 68, 68, 0.1);
+  --red-border: rgba(239, 68, 68, 0.25);
+  --red-bright: #f87171;
+  --yellow: #f59e0b;
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.7);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f0f2f7;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f7fb;
+  --bg-input: #f5f7fb;
+  --bg-modal: #ffffff;
+  --border: #dde2ee;
+  --border-light: #c8d0e0;
+  --text-primary: #0f1729;
+  --text-secondary: #4a5878;
+  --text-muted: #8a97b0;
+  --accent-blue: #2563eb;
+  --accent-blue-dim: rgba(37, 99, 235, 0.08);
+  --accent-blue-glow: rgba(37, 99, 235, 0.2);
+  --green: #16a34a;
+  --green-dim: rgba(22, 163, 74, 0.08);
+  --green-border: rgba(22, 163, 74, 0.25);
+  --green-bright: #15803d;
+  --red: #dc2626;
+  --red-dim: rgba(220, 38, 38, 0.08);
+  --red-border: rgba(220, 38, 38, 0.25);
+  --red-bright: #b91c1c;
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font);
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: var(--font);
+  outline: none;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
