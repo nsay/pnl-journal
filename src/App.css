@@ -677,6 +677,13 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
+  transition: color 0.15s;
+}
+
+.year-month-name:hover {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .year-month-total { font-size: 13px; font-weight: 700; }

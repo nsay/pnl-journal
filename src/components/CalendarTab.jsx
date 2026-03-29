@@ -169,7 +169,7 @@ export default function CalendarTab() {
         </>
       )}
       {view === 'week' && <WeekView cursor={cursor} openModal={openModal} getDayNet={getDayNet} trades={trades} />}
-      {view === 'year' && <YearView cursor={cursor} openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} trades={trades} />}
+      {view === 'year' && <YearView cursor={cursor} openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} trades={trades} goToMonth={(m) => { setCursor(new Date(cursor.getFullYear(), m, 1)); setView('month') }} />}
       {view === 'alltime' && <AllTimeView openModal={openModal} getDayNet={getDayNet} getMonthSummary={getMonthSummary} getAllYears={getAllYears} />}
 
       {/* Chart */}
@@ -455,7 +455,7 @@ function WeekView({ cursor, openModal, getDayNet, trades }) {
 }
 
 // ── Year View ────────────────────────────────────────────────────
-function YearView({ cursor, openModal, getDayNet, getMonthSummary, trades }) {
+function YearView({ cursor, openModal, getDayNet, getMonthSummary, trades, goToMonth }) {
   const year = cursor.getFullYear()
 
   return (
@@ -479,7 +479,7 @@ function YearView({ cursor, openModal, getDayNet, getMonthSummary, trades }) {
         return (
           <div key={m} className="year-month-card">
             <div className="year-month-header">
-              <div className="year-month-name">{MONTHS[m]}</div>
+              <div className="year-month-name" onClick={() => goToMonth(m)} style={{ cursor: 'pointer' }}>{MONTHS[m]}</div>
               <div className={`year-month-total ${netCls}`}>
                 {hasTrades ? formatCurrency(summary.totalNet) : '—'}
               </div>
