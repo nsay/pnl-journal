@@ -119,7 +119,6 @@ export default function App() {
       <div className="app">
         <nav className="navbar">
           <div className="navbar-brand">
-            <div className="brand-icon">📈</div>
             PnL Journal
           </div>
 
