@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTrades, formatDateKey, formatCurrency, formatCurrencyPlain } from '../context/TradesContext'
 import TradeModal from './TradeModal'
+import ImportModal from './ImportModal'
 import { WeekChart, MonthChart, YearChart, AllTimeChart } from './PnLChart'
 
 const MONTHS = ['January','February','March','April','May','June',
@@ -21,6 +22,7 @@ export default function CalendarTab() {
   const [view, setView] = useState('month')
   const [cursor, setCursor] = useState(new Date(today))
   const [modalDate, setModalDate] = useState(null)
+  const [showImport, setShowImport] = useState(false)
   const { getDayNet, getMonthSummary, getWeekSummary, getAllYears, trades } = useTrades()
 
   function openModal(date) { setModalDate(date) }
@@ -112,6 +114,10 @@ export default function CalendarTab() {
         </div>
 
         <div className="calendar-header-right">
+          <button className="import-csv-btn" onClick={() => setShowImport(true)}>
+            ↑ Import CSV
+          </button>
+
           {/* View switcher */}
           <div className="view-tabs">
             {['week','month','year','alltime'].map(v => (
@@ -188,6 +194,7 @@ export default function CalendarTab() {
       </div>
 
       {modalDate && <TradeModal date={modalDate} onClose={closeModal} />}
+      {showImport && <ImportModal onClose={() => setShowImport(false)} />}
     </div>
   )
 }
