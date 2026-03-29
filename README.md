@@ -7,7 +7,8 @@ A modern trading journal web app built with React and Vite. Track and visualize 
 - **Calendar Views** — switch between Week, Month, Year, and All Time
 - **Daily Trade Entry** — click any day to log trades with ticker, gross profit, gross loss, and fees. Net P&L is calculated automatically
 - **P&L Chart** — bar + cumulative line chart at the bottom of each view, scoped to the active period
-- **CSV Import** — drop a CSV into `public/data/trades.csv` and import it directly in the app (merge or replace)
+- **Monthly Notes** — write notes for each month in the Month view; start with `BULLISH`, `BEARISH`, `CHOPPY`, or `FLAT` to render a colored market-condition badge
+- **CSV Import** — drop a CSV into `public/data/trades.csv` and import it directly in the app (merge or replace); optionally include `public/data/notes.csv` to pre-populate monthly notes
 - **Dark / Light Mode** — toggle in the top-right navbar, preference persists across sessions
 - **Local Persistence** — all data is saved to `localStorage`, no account or server needed
 
@@ -39,6 +40,19 @@ date,ticker,grossProfit,grossLoss,fees
 Multiple rows with the same date are treated as separate trades on that day.
 
 Once the file is in place, click the **⚙️ Settings** icon in the navbar → **Import CSV**. Choose **Merge** to add alongside existing data or **Replace All** to start fresh.
+
+## Importing Notes via CSV
+
+Optionally place a notes file at `public/data/notes.csv` alongside your trades CSV. It will be imported at the same time:
+
+```
+month,notes
+2024-01,"CHOPPY - Fed crushed rate cut hopes early in the year."
+2024-02,"BULLISH - Strong trend off the lows, momentum carried all month."
+```
+
+- **month** — `YYYY-MM` format
+- **notes** — free-form text, quoted if it contains commas. Start with `BULLISH`, `BEARISH`, `CHOPPY`, or `FLAT` (optionally followed by ` - `) to display a colored badge in the Month view.
 
 ## Tech Stack
 
