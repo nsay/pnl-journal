@@ -7,7 +7,7 @@
  * Returns:
  *   { data: { [dateKey]: trade[] }, totalTrades, totalDays, errors }
  */
-export async function fetchAndParseCSV(path = '/data/trades.csv') {
+export async function fetchAndParseCSV(path = `${import.meta.env.BASE_URL}data/trades.csv`) {
   const res = await fetch(path)
   if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`)
   const text = await res.text()
