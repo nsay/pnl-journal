@@ -73,6 +73,199 @@
   letter-spacing: 0.3px;
 }
 
+/* ── Account Switcher ── */
+.acct-wrap {
+  position: relative;
+}
+
+.acct-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+  max-width: 160px;
+}
+
+.acct-btn:hover,
+.acct-btn.active {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.acct-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acct-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 240px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  overflow: hidden;
+  animation: slideUp 0.15s ease;
+}
+
+.acct-dropdown-header {
+  padding: 10px 14px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.acct-row {
+  display: flex;
+  align-items: center;
+}
+
+.acct-row.current .acct-row-name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.acct-row-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.acct-row-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.acct-check {
+  width: 14px;
+  font-size: 11px;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.acct-row-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acct-row-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.acct-row-btn:hover .acct-row-actions {
+  opacity: 1;
+}
+
+.acct-action {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+  cursor: pointer;
+}
+
+.acct-action:hover {
+  background: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.acct-action.danger:hover {
+  background: var(--red-dim);
+  border-color: var(--red-border);
+  color: var(--red);
+}
+
+.acct-edit-row {
+  padding: 6px 12px;
+  width: 100%;
+}
+
+.acct-name-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.acct-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.acct-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: all 0.12s;
+}
+
+.acct-new-btn:hover {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+}
+
+.acct-create {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.acct-create-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* ── Settings Dropdown ── */
 .settings-wrap {
   position: relative;
