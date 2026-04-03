@@ -2,18 +2,33 @@ import { useState, useEffect } from 'react'
 import { fetchAndParseCSV, fetchAndParseNotesCSV } from '../utils/parseCSV'
 import { useTrades, formatCurrency } from '../context/TradesContext'
 
+const CSV_FILES = [
+  { id: 'day-trades',   label: 'Day Trades',   file: 'day-trades.csv'   },
+  { id: 'swing-trades', label: 'Swing Trades', file: 'swing-trades.csv' },
+  { id: 'crypto-trades', label: 'Crypto Trades', file: 'crypto-trades.csv' },
+]
+
 export default function ImportModal({ onClose }) {
   const { saveDayTrades, saveNote, trades: existingTrades } = useTrades()
-  const [status, setStatus] = useState('loading') // loading | preview | done | error
-  const [trades, setTrades] = useState(null)
-  const [notes, setNotes] = useState(null)
-  const [mode, setMode] = useState('merge')
+
+  const [selectedFile, setSelectedFile] = useState(CSV_FILES[0].id)
+  const [status, setStatus]   = useState('loading') // loading | preview | done | error
+  const [trades, setTrades]   = useState(null)
+  const [notes, setNotes]     = useState(null)
+  const [mode, setMode]       = useState('merge')
   const [errorMsg, setErrorMsg] = useState('')
 
+  // Re-fetch whenever the selected file changes
   useEffect(() => {
+    const csvEntry = CSV_FILES.find(f => f.id === selectedFile)
+    const path = `${import.meta.env.BASE_URL}data/${csvEntry.file}`
+    setStatus('loading')
+    setTrades(null)
+    setNotes(null)
+
     Promise.all([
-      fetchAndParseCSV(),
-      fetchAndParseNotesCSV().catch(() => null), // notes.csv is optional
+      fetchAndParseCSV(path),
+      fetchAndParseNotesCSV().catch(() => null),
     ]).then(([tradesResult, notesResult]) => {
       setTrades(tradesResult)
       setNotes(notesResult)
@@ -22,7 +37,7 @@ export default function ImportModal({ onClose }) {
       setErrorMsg(err.message)
       setStatus('error')
     })
-  }, [])
+  }, [selectedFile])
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -31,7 +46,6 @@ export default function ImportModal({ onClose }) {
   }, [onClose])
 
   function handleImport() {
-    // Import trades
     if (mode === 'replace') {
       Object.keys(existingTrades).forEach(key => saveDayTrades(key, []))
       Object.entries(trades.data).forEach(([key, rows]) => saveDayTrades(key, rows))
@@ -42,16 +56,8 @@ export default function ImportModal({ onClose }) {
       })
     }
 
-    // Import notes
     if (notes) {
-      Object.entries(notes.data).forEach(([monthKey, text]) => {
-        if (mode === 'replace') {
-          saveNote(monthKey, text)
-        } else {
-          // Merge: only write if no existing note for that month
-          saveNote(monthKey, text)
-        }
-      })
+      Object.entries(notes.data).forEach(([monthKey, text]) => saveNote(monthKey, text))
     }
 
     setStatus('done')
@@ -62,21 +68,55 @@ export default function ImportModal({ onClose }) {
         sum + (parseFloat(t.grossProfit) || 0) - (parseFloat(t.grossLoss) || 0) - (parseFloat(t.fees) || 0), 0)
     : 0
 
+  const selectedEntry = CSV_FILES.find(f => f.id === selectedFile)
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 500 }}>
         <div className="modal-header">
           <div>
             <div className="modal-title">Import from CSV</div>
-            <div className="modal-date">public/data/trades.csv &amp; notes.csv</div>
+            <div className="modal-date">public/data/{selectedEntry?.file}</div>
           </div>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-body">
+
+          {/* ── CSV file picker ── */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>
+              Select File
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {CSV_FILES.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => { if (f.id !== selectedFile) { setSelectedFile(f.id); setStatus('loading') } }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 6px',
+                    borderRadius: 'var(--radius-md)',
+                    border: `1px solid ${selectedFile === f.id ? 'var(--accent-blue)' : 'var(--border)'}`,
+                    background: selectedFile === f.id ? 'var(--accent-blue-dim)' : 'var(--bg-input)',
+                    color: selectedFile === f.id ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                    fontSize: 12.5,
+                    fontWeight: selectedFile === f.id ? 700 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    textAlign: 'center',
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── States ── */}
           {status === 'loading' && (
-            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: 13 }}>
-              Loading CSV files…
+            <div style={{ textAlign: 'center', padding: '28px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              Loading {selectedEntry?.file}…
             </div>
           )}
 
@@ -92,18 +132,27 @@ export default function ImportModal({ onClose }) {
               {/* Trades stats */}
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: 8 }}>
-                  trades.csv
+                  {selectedEntry?.file}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                  <StatBox label="Trades" value={trades.totalTrades} />
-                  <StatBox label="Trading Days" value={trades.totalDays} />
-                  <StatBox
-                    label="Net P&L"
-                    value={formatCurrency(previewNet)}
-                    color={previewNet >= 0 ? 'var(--green)' : 'var(--red)'}
-                  />
-                </div>
-                {trades.errors.length > 0 && <ErrorList errors={trades.errors} />}
+
+                {trades.empty ? (
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', padding: '12px 14px', background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
+                    This file has no data rows — nothing to import.
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                      <StatBox label="Trades" value={trades.totalTrades} />
+                      <StatBox label="Trading Days" value={trades.totalDays} />
+                      <StatBox
+                        label="Net P&L"
+                        value={formatCurrency(previewNet)}
+                        color={previewNet >= 0 ? 'var(--green)' : 'var(--red)'}
+                      />
+                    </div>
+                    {trades.errors.length > 0 && <ErrorList errors={trades.errors} />}
+                  </>
+                )}
               </div>
 
               {/* Notes stats */}
@@ -126,25 +175,27 @@ export default function ImportModal({ onClose }) {
                 )}
               </div>
 
-              {/* Mode selector */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px' }}>
-                  Import Mode
+              {/* Mode selector — only shown when there's data to import */}
+              {!trades.empty && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.7px' }}>
+                    Import Mode
+                  </div>
+                  <ModeOption
+                    active={mode === 'merge'}
+                    onClick={() => setMode('merge')}
+                    title="Merge"
+                    desc="Add CSV data alongside existing entries."
+                  />
+                  <ModeOption
+                    active={mode === 'replace'}
+                    onClick={() => setMode('replace')}
+                    title="Replace All"
+                    desc="Erase all existing journal data and load only the CSV."
+                    danger
+                  />
                 </div>
-                <ModeOption
-                  active={mode === 'merge'}
-                  onClick={() => setMode('merge')}
-                  title="Merge"
-                  desc="Add CSV data alongside existing entries."
-                />
-                <ModeOption
-                  active={mode === 'replace'}
-                  onClick={() => setMode('replace')}
-                  title="Replace All"
-                  desc="Erase all existing journal data and load only the CSV."
-                  danger
-                />
-              </div>
+              )}
             </>
           )}
 
@@ -168,7 +219,7 @@ export default function ImportModal({ onClose }) {
             ) : (
               <>
                 <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-                {status === 'preview' && (
+                {status === 'preview' && !trades?.empty && (
                   <button className="btn btn-primary" onClick={handleImport}>
                     Import All
                   </button>

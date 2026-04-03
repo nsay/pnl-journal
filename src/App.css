@@ -91,6 +91,7 @@
   font-size: 13px;
   font-weight: 600;
   transition: all 0.15s;
+  min-width: 110px;
   max-width: 160px;
 }
 

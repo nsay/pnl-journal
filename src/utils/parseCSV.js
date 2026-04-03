@@ -7,7 +7,7 @@
  * Returns:
  *   { data: { [dateKey]: trade[] }, totalTrades, totalDays, errors }
  */
-export async function fetchAndParseCSV(path = `${import.meta.env.BASE_URL}data/trades.csv`) {
+export async function fetchAndParseCSV(path = `${import.meta.env.BASE_URL}data/day-trades.csv`) {
   const res = await fetch(path)
   if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`)
   const text = await res.text()
@@ -16,7 +16,7 @@ export async function fetchAndParseCSV(path = `${import.meta.env.BASE_URL}data/t
 
 export function parseCSVText(text) {
   const lines = text.trim().split(/\r?\n/).filter(Boolean)
-  if (lines.length < 2) throw new Error('CSV has no data rows')
+  if (lines.length < 2) return { data: {}, totalTrades: 0, totalDays: 0, errors: [], empty: true }
 
   // Parse header — normalise to camelCase keys
   const headers = lines[0].split(',').map(h => normaliseHeader(h.trim()))
@@ -32,7 +32,6 @@ export function parseCSVText(text) {
     const row = {}
     headers.forEach((h, idx) => { row[h] = values[idx] ?? '' })
 
-    // Validate date
     if (!row.date || !/^\d{4}-\d{2}-\d{2}$/.test(row.date)) {
       errors.push(`Row ${i + 2}: invalid date "${row.date}"`)
       return
